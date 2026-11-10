@@ -1,0 +1,25 @@
+name: Generate SignBridge Arabic audio
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/generate_arabic_audio.py
+      - .github/workflows/arabic-audio.yml
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install gTTS==2.5.4
+      - run: python scripts/generate_arabic_audio.py
+      - name: Commit generated clips
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio/ar
+          git diff --cached --quiet || (git commit -m "Publish Arabic voice clips" && git push)
